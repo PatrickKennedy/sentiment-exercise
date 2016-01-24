@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+var config = require('./config');
 var fs = require('fs');
 var parse = require('csv-parse');
 var argv = require('yargs')
@@ -33,16 +34,39 @@ fs.createReadStream('./dictionary.csv')
   .on('end', main);
 
 function main() {
-  var analyser = require('./src/sentiment.js')(dictionary);
-  console.log(argv.keyword, analyser.process([argv.keyword]));
+  var TwitterClient = require('./src/twitter_client.js')
+      , twitter = new TwitterClient(config)
+      , analyser = require('./src/sentiment.js')(dictionary)
+      , results = []
+  ;
 
-  console.log('Keyword:', argv.k)
-  console.log('Verbosity:', argv.v ? "on" : "off")
-  console.log('Sample size:', argv.s)
+  var sample_size = parseInt(argv.s);
+  sample_size = Number.isInteger(sample_size) ? sample_size : 20;
+  twitter.config.twitter.count = sample_size;
 
-  console.log('\nAnalyzed:', "0 Tweets")
-  console.log('Positive:', "0")
-  console.log('Negative:', "0")
-  console.log('Neutral:', "0")
+  console.log('Keyword:', argv.k);
+  console.log('Verbosity:', argv.v ? "on" : "off");
+  console.log('Sample size:', sample_size);
+
+  twitter.get_tweet_texts(argv.keyword, function(err, tweet_texts){
+    tweet_texts.forEach(function(tweet) {
+      var result = analyser.process(tweet.toLowerCase().split(' '));
+      if (typeof result === "undefined")
+        return;
+
+      results.push(result);
+      if (argv.v) {
+        var sentiment = result > 0 ? "Positive" : result < 0 ? "Negative" : "Neutral";
+        console.log("Tweet:", tweet);
+        console.log("Sentiment:", sentiment, "("+ result +")");
+        console.log('-----');
+      }
+    });
+
+    console.log('\nAnalyzed:', results.length, "Tweets");
+    console.log('Positive:', results.reduce((l, r) => l + (r > 0), 0 ));
+    console.log('Negative:', results.reduce((l, r) => l + (r < 0), 0 ));
+    console.log('Neutral: ', results.reduce((l, r) => l + (r == 0), 0 ));
+  });
 }
 

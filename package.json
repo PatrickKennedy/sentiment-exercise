@@ -1,6 +1,6 @@
 {
   "name": "socialytics",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "The Next Big Thing",
   "main": "app.js",
   "scripts": {

@@ -35,6 +35,6 @@
     "yargs": "^3.32.0"
   },
   "dependencies": {
-    "csv-parse": "^1.0.1",
+    "csv-parse": "^1.0.1"
   }
 }

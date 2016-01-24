@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+var fs = require('fs');
+var parse = require('csv-parse');
 var argv = require('yargs')
     .usage('Usage: node main.js [options]')
     .option('k', {
@@ -20,11 +22,27 @@ var argv = require('yargs')
     })
     .argv;
 
-console.log('Keyword:', argv.k)
-console.log('Verbosity:', argv.v ? "on" : "off")
-console.log('Sample size:', argv.s)
 
-console.log('\nAnalyzed:', "0 Tweets")
-console.log('Positive:', "0")
-console.log('Negative:', "0")
-console.log('Neutral:', "0")
+var dictionary = {};
+fs.createReadStream('./dictionary.csv')
+  .pipe(parse({}, function(err, data){
+    data.forEach(function(line) {
+      dictionary[line[0]] = {positive: 1, negative: -1}[line[1]] || 0;
+    });
+  }))
+  .on('end', main);
+
+function main() {
+  var analyser = require('./src/sentiment.js')(dictionary);
+  console.log(argv.keyword, analyser.process([argv.keyword]));
+
+  console.log('Keyword:', argv.k)
+  console.log('Verbosity:', argv.v ? "on" : "off")
+  console.log('Sample size:', argv.s)
+
+  console.log('\nAnalyzed:', "0 Tweets")
+  console.log('Positive:', "0")
+  console.log('Negative:', "0")
+  console.log('Neutral:', "0")
+}
+

@@ -1,12 +1,12 @@
-analyzer = function(dictionary){
+var Analyzer = function(dictionary){
   var self = this;
   self.dictionary = dictionary;
 };
 
-analyzer.prototype.process = function(words) {
+Analyzer.prototype.process = function(words) {
   var self = this;
   // quick and dirty way of turning a string into an array but keeping arrays
-  // the same.
+  // the same. This should eventually throw an error.
   words = [].concat(words);
   var map = words.map(function(word){ return self.dictionary[word]; });
   if (map.every(function(word){ return word === undefined; }))
@@ -20,6 +20,6 @@ analyzer.prototype.process = function(words) {
 var instance;
 
 module.exports = function(dictionary) {
-  instance = instance || new analyzer(dictionary)
+  instance = instance || new Analyzer(dictionary)
   return instance;
 };

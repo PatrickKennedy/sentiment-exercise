@@ -123,11 +123,22 @@ module.exports = function(grunt) {
       unit: {
         dir: '<%= build_dir %>',
         src: [
-          '<%= vendor_files.js %>',
-          '<%= html2js.templates.dest %>',
+          '<%= app_files.js %>',
           '<%= test_files.js %>'
         ]
       }
+    },
+
+    mochaTest: {
+      test: {
+        options: {
+          reporter: 'spec',
+          require: ['chai'],
+          ui: 'bdd',
+          clearRequireCache: true,
+        },
+        src: ['<%= app_files.jsunit %>']
+      },
     },
   };
 
@@ -155,7 +166,6 @@ module.exports = function(grunt) {
   grunt.registerTask('build', [
     'clean',
     'jshint',
-    'concat:build_css',
     'copy:build_appjs',
     'karmaconfig',
  ]);
@@ -167,6 +177,17 @@ module.exports = function(grunt) {
   grunt.registerTask('compile', [
     'concat:compile_js',
   ]);
+
+
+  // On watch events, if the changed file is a test file then configure mochaTest to only
+  // run the tests from that file. Otherwise run all the tests
+  var defaultTestSrc = grunt.config('mochaTest.test.src');
+  grunt.event.on('watch', function(action, filepath) {
+    grunt.config('mochaTest.test.src', defaultTestSrc);
+    if (filepath.match('spec.js')) {
+      grunt.config('mochaTest.test.src', filepath);
+    }
+  });
 
   /**
    * A utility function to get all app JavaScript sources.

@@ -4,7 +4,7 @@ module.exports = {
   compile_dir: 'release',
 
   app_files: {
-    js: [ 'src/**/*.js', '!src/**/*.spec.js', '!src/assets/**/*.js' ],
+    js: [ 'src/**/*.js', '!src/**/*.spec.js' ],
     jsunit: [ 'src/**/*.spec.js' ],
   },
 

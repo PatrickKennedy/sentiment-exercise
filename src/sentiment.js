@@ -13,7 +13,7 @@ Analyzer.prototype.process = function(words) {
     return undefined;
 
   return map.reduce(function(score, sentiment) {
-    return score + (sentiment || 0);
+    return score + ({positive: 1, negative: -1}[sentiment] || 0);
   }, 0);
 };
 

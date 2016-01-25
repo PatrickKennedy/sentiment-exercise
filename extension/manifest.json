@@ -1,0 +1,28 @@
+{
+  "manifest_version": 2,
+
+  "name": "Socialytics",
+  "description": "Analyze tweets and highlight them based on their sentiment",
+  "version": "1.0",
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.twitter.com/*"],
+      "css": ["extra.css"],
+      "js": ["jquery-2.2.0.min.js", "content.js"]
+    }
+  ],
+  "page_action": {
+    "default_icon": "icon.png"
+  },
+  "permissions": [
+    "activeTab",
+    "tabs"
+  ],
+  "web_accessible_resources": [
+    "dictionary.json"
+  ]
+}

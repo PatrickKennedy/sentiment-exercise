@@ -24,14 +24,8 @@ var argv = require('yargs')
     .argv;
 
 
-var dictionary = {};
-fs.createReadStream('./dictionary.csv')
-  .pipe(parse({}, function(err, data){
-    data.forEach(function(line) {
-      dictionary[line[0]] = {positive: 1, negative: -1}[line[1]] || 0;
-    });
-  }))
-  .on('end', main);
+var dictionary = require('./dictionary.json');
+main();
 
 function main() {
   var TwitterClient = require('./src/twitter_client.js')

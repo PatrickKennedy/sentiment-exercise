@@ -3,20 +3,9 @@ describe('socialytics', function() {
     var analyzer;
     var expect = require('chai').expect
 
-    before(function(done) {
-      var dictionary = {};
-      var fs = require('fs');
-      var parse = require('csv-parse');
-      fs.createReadStream('./dictionary.csv')
-        .pipe(parse({}, function(err, data){
-          data.forEach(function(line) {
-            dictionary[line[0]] = {positive: 1, negative: -1}[line[1]] || 0;
-          });
-        }))
-        .on('end', function(){
-          analyzer = require("./sentiment")(dictionary);
-          done();
-        });
+    before(function() {
+      var dictionary = require('./dictionary.json');
+      analyzer = require("./sentiment")(dictionary);
     });
 
     it('should have an Analyzer', function() {

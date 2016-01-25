@@ -19,9 +19,13 @@ Analyzer.prototype.process = function(words) {
   }, 0);
 };
 
-
+// storage variables
 var dictionary = {};
 var analyzer = {};
+
+// config variables
+var show_only_positive = false;
+var toggle_show = false;
 
 jQuery.getJSON(chrome.extension.getURL('/dictionary.json'), function(data) {
   dictionary = data;
@@ -31,6 +35,8 @@ jQuery.getJSON(chrome.extension.getURL('/dictionary.json'), function(data) {
 
 chrome.runtime.onMessage.addListener(function(req, sender, sendResponse) {
   console.log("page action clicked");
+  if (toggle_show)
+    show_only_positive = show_only_positive ? false : true;
   process_page();
 });
 
@@ -42,13 +48,18 @@ function process_page() {
     var tweet_text = tweet.find(".tweet-text").text();
     var icon_bar = tweet.find(".stream-item-header");
 
+    var sentiment = analyzer.process(tweet_text.split(' '));
+
+    if (show_only_positive && (typeof sentiment === "undefined" || sentiment < 1))
+      tweet.hide();
+    else
+      tweet.show();
+
     // skip tweets we've seen already to avoid duplication
     if(tweet.data("socialytics"))
       return true;
     else
       tweet.data("socialytics", true);
-
-    var sentiment = analyzer.process(tweet_text.split(' '));
 
     console.log(sentiment, tweet_text);
     if (typeof sentiment === "undefined")

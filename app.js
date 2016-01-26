@@ -45,7 +45,6 @@ function main() {
       , client = new Client(config)
       , analyzer = require('./src/sentiment.js')(dictionary)
       , results = []
-      , total = 0
   ;
 
   var sample_size = parseInt(argv.s);
@@ -56,17 +55,31 @@ function main() {
   console.log('Sample size:', sample_size);
 
   client.get_content({q:argv.keyword, count:sample_size}, function(err, content){
-    total = content.length;
-    content.forEach(function(message) {
+    var total = content.length;
+
+    if (argv.v)
+      console.log(); // a pleasing line break
+
+    content.forEach(function(message, index) {
       var result = analyzer.process(analyzer.clean(analyzer.format(message)));
-      if (typeof result === "undefined")
+      var score = result.score;
+      var hits = result.hits;
+      if (typeof score === "undefined")
         return;
 
-      results.push(result);
+      results.push(score);
+
       if (argv.v) {
-        var sentiment = result > 0 ? "Positive" : result < 0 ? "Negative" : "Neutral";
+        Object.keys(result.hits).forEach(function(word){
+          var regex = new RegExp(`\\b(${word})\\b`, 'i');
+          var color = hits[word] > 0 ? "\x1b[32m" : hits[word] < 0 ? "\x1b[31m" : "\x1b[37m";
+          message = message.replace(regex, `${color}$1\x1b[0m`);
+        });
+
+        var sentiment = score > 0 ? "Positive" : score < 0 ? "Negative" : "Neutral";
+        var color = score > 0 ? "\x1b[32m" : score < 0 ? "\x1b[31m" : "\x1b[37m";
         console.log("Tweet:", message);
-        console.log("Sentiment:", sentiment, `(${result})`);
+        console.log(`Sentiment: ${color}${sentiment}\x1b[0m (${result.score})`);
         console.log('-----');
       }
     });

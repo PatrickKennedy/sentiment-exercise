@@ -32,7 +32,8 @@ var argv = require('yargs')
     .check(function(argv){
       if(!Number.isInteger(argv.s) || argv.s <= 0)
         throw new Error(`Error: sample-size must be a positive integer. ex. -s 10 | Received: ${argv.s}`);
-      })
+      return true;
+    })
     .argv;
 
 
@@ -42,8 +43,9 @@ main();
 function main() {
   var Client = require(`./src/${argv.c}_client.js`)
       , client = new Client(config)
-      , analyser = require('./src/sentiment.js')(dictionary)
+      , analyzer = require('./src/sentiment.js')(dictionary)
       , results = []
+      , total = 0
   ;
 
   var sample_size = parseInt(argv.s);
@@ -54,8 +56,9 @@ function main() {
   console.log('Sample size:', sample_size);
 
   client.get_content({q:argv.keyword, count:sample_size}, function(err, content){
+    total = content.length;
     content.forEach(function(message) {
-      var result = analyser.process(message.toLowerCase().split(' '));
+      var result = analyzer.process(analyzer.clean(analyzer.format(message)));
       if (typeof result === "undefined")
         return;
 
@@ -68,7 +71,7 @@ function main() {
       }
     });
 
-    console.log('\nAnalyzed:', results.length, "Tweets");
+    console.log('\nAnalyzed:', total, "Tweets");
     console.log('Positive:', results.reduce((l, r) => l + (r > 0), 0 ));
     console.log('Negative:', results.reduce((l, r) => l + (r < 0), 0 ));
     console.log('Neutral: ', results.reduce((l, r) => l + (r === 0), 0 ));

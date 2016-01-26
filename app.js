@@ -28,6 +28,11 @@ var argv = require('yargs')
       choices: ['twitter', 'fixed'],
       describe: 'Select the client to query'
     })
+
+    .check(function(argv){
+      if(!Number.isInteger(argv.s) || argv.s <= 0)
+        throw new Error(`Error: sample-size must be a positive integer. ex. -s 10 | Received: ${argv.s}`);
+      })
     .argv;
 
 

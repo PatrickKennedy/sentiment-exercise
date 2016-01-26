@@ -64,20 +64,13 @@ module.exports = function(grunt) {
       },
 
       jssrc: {
-        files: [
-          '<%= app_files.js %>'
-       ],
-        tasks: ['jshint:src', 'karma:unit:run', 'copy:build_appjs']
+        files: ['<%= app_files.js %>'],
+        tasks: ['jshint:src', 'mochaTest:test', 'copy:build_appjs']
       },
 
       jsunit: {
-        files: [
-          '<%= app_files.jsunit %>'
-        ],
-        tasks: [ 'jshint:test', 'karma:unit:run' ],
-        options: {
-          livereload: false
-        }
+        files: ['<%= app_files.jsunit %>'],
+        tasks: ['jshint:test', 'mochaTest:test'],
       },
     },
 
@@ -103,30 +96,6 @@ module.exports = function(grunt) {
         "-W070": false, // Trailing Semicolon
         "-W116": false, // Bracketless If-statements
       },
-      globals: {}
-    },
-
-    karma: {
-      options: {
-        configFile: '<%= build_dir %>/karma-unit.js'
-      },
-      unit: {
-        port: 9019,
-        background: true
-      },
-      continuous: {
-        singleRun: true
-      }
-    },
-
-    karmaconfig: {
-      unit: {
-        dir: '<%= build_dir %>',
-        src: [
-          '<%= app_files.js %>',
-          '<%= test_files.js %>'
-        ]
-      }
     },
 
     mochaTest: {
@@ -153,12 +122,12 @@ module.exports = function(grunt) {
    * before watching for changes.
    */
   grunt.renameTask('watch', 'delta');
-  grunt.registerTask('watch', ['build', 'karma:unit', 'delta']);
+  grunt.registerTask('watch', ['build', 'mochaTest:test',  'delta']);
 
   /**
    * The default task is to build and compile.
    */
-  grunt.registerTask('default', ['build', 'karma:continuous', 'compile']);
+  grunt.registerTask('default', ['build', 'compile']);
 
   /**
    * The `build` task gets your app ready to run for development and testing.
@@ -167,7 +136,6 @@ module.exports = function(grunt) {
     'clean',
     'jshint',
     'copy:build_appjs',
-    'karmaconfig',
  ]);
 
   /**
@@ -187,33 +155,5 @@ module.exports = function(grunt) {
     if (filepath.match('spec.js')) {
       grunt.config('mochaTest.test.src', filepath);
     }
-  });
-
-  /**
-   * A utility function to get all app JavaScript sources.
-   */
-  function filterForJS (files) {
-    return files.filter(function (file) {
-      return file.match(/\.js$/);
-    });
-  }
-
-  /**
-   * In order to avoid having to specify manually the files needed for karma to
-   * run, we use grunt to manage the list for us. The `karma/*` files are
-   * compiled as grunt templates for use by Karma. Yay!
-   */
-  grunt.registerMultiTask( 'karmaconfig', 'Process karma config templates', function () {
-    var jsFiles = filterForJS(this.filesSrc);
-
-    grunt.file.copy( 'karma/karma-unit.tpl.js', grunt.config( 'build_dir' ) + '/karma-unit.js', {
-      process: function ( contents, path ) {
-        return grunt.template.process( contents, {
-          data: {
-            scripts: jsFiles,
-          }
-        });
-      }
-    });
   });
 };

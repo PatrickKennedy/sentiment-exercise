@@ -6,19 +6,19 @@ var TwitterClient = function(config) {
   self.config = config;
 };
 
-TwitterClient.prototype.search = function(keyword, cb) {
+TwitterClient.prototype.search = function(options, cb) {
   var self = this;
   var params = {
-    q: keyword,
-    lang: self.config.twitter.lang || "en",
-    count: self.config.twitter.count || 20,
+    q: options.q,
+    lang: options.lang || self.config.twitter.lang || "en",
+    count: options.count || self.config.twitter.count || 20,
   };
   self.client.get('search/tweets', params, cb);
 };
 
-TwitterClient.prototype.get_tweet_texts = function(keyword, cb) {
+TwitterClient.prototype.get_content = function(options, cb) {
   var self = this;
-  self.search(keyword, function(err, tweets){
+  self.search(options, function(err, tweets){
     tweet_texts = tweets.statuses.map(function(tweet){
       return tweet.text;
     });

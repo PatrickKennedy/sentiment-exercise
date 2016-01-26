@@ -28,31 +28,30 @@ var dictionary = require('./dictionary.json');
 main();
 
 function main() {
-  var TwitterClient = require('./src/twitter_client.js')
-      , twitter = new TwitterClient(config)
+  var Client = require('./src/twitter_client.js')
+      , client = new Client(config)
       , analyser = require('./src/sentiment.js')(dictionary)
       , results = []
   ;
 
   var sample_size = parseInt(argv.s);
   sample_size = Number.isInteger(sample_size) ? sample_size : 20;
-  twitter.config.twitter.count = sample_size;
 
   console.log('Keyword:', argv.k);
   console.log('Verbosity:', argv.v ? "on" : "off");
   console.log('Sample size:', sample_size);
 
-  twitter.get_tweet_texts(argv.keyword, function(err, tweet_texts){
-    tweet_texts.forEach(function(tweet) {
-      var result = analyser.process(tweet.toLowerCase().split(' '));
+  client.get_content({q:argv.keyword, count:sample_size}, function(err, content){
+    content.forEach(function(message) {
+      var result = analyser.process(message.toLowerCase().split(' '));
       if (typeof result === "undefined")
         return;
 
       results.push(result);
       if (argv.v) {
         var sentiment = result > 0 ? "Positive" : result < 0 ? "Negative" : "Neutral";
-        console.log("Tweet:", tweet);
-        console.log("Sentiment:", sentiment, "("+ result +")");
+        console.log("Tweet:", message);
+        console.log("Sentiment:", sentiment, `(${result})`);
         console.log('-----');
       }
     });
@@ -60,7 +59,7 @@ function main() {
     console.log('\nAnalyzed:', results.length, "Tweets");
     console.log('Positive:', results.reduce((l, r) => l + (r > 0), 0 ));
     console.log('Negative:', results.reduce((l, r) => l + (r < 0), 0 ));
-    console.log('Neutral: ', results.reduce((l, r) => l + (r == 0), 0 ));
+    console.log('Neutral: ', results.reduce((l, r) => l + (r === 0), 0 ));
   });
 }
 

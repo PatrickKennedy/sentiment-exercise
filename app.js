@@ -21,6 +21,13 @@ var argv = require('yargs')
       default: false,
       describe: 'Run verbosely'
     })
+
+    .option('c', {
+      alias: 'client',
+      default: "twitter",
+      choices: ['twitter', 'fixed'],
+      describe: 'Select the client to query'
+    })
     .argv;
 
 
@@ -28,7 +35,7 @@ var dictionary = require('./dictionary.json');
 main();
 
 function main() {
-  var Client = require('./src/twitter_client.js')
+  var Client = require(`./src/${argv.c}_client.js`)
       , client = new Client(config)
       , analyser = require('./src/sentiment.js')(dictionary)
       , results = []

@@ -5,6 +5,20 @@ var Analyzer = function(dictionary){
   self.dictionary = dictionary;
 };
 
+Analyzer.prototype.format = function(words, options) {
+  options = options || {};
+  return words.split(options.delimiter || ' ');
+};
+
+Analyzer.prototype.clean = function(words, options) {
+  options = options || {};
+  return words.map(function(word){
+    word = word.toLowerCase();
+    word = word.replace(options.regex || /\W+/, '');
+    return word;
+  });
+};
+
 Analyzer.prototype.process = function(words) {
   var self = this;
   // quick and dirty way of turning a string into an array but keeping arrays
@@ -48,7 +62,7 @@ function process_page() {
     var tweet_text = tweet.find(".tweet-text").text();
     var icon_bar = tweet.find(".stream-item-header");
 
-    var sentiment = analyzer.process(tweet_text.split(' '));
+    var sentiment = analyzer.process(analyzer.clean(analyzer.format(tweet_text)));
 
     if (show_only_positive && (typeof sentiment === "undefined" || sentiment < 1))
       tweet.hide();

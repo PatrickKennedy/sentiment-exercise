@@ -19,16 +19,32 @@ Analyzer.prototype.clean = function(words, options) {
 
 Analyzer.prototype.process = function(words) {
   var self = this;
+  var any_defined;
+  var hits = {};
+
   // quick and dirty way of turning a string into an array but keeping arrays
   // the same. This should eventually throw an error.
   words = [].concat(words);
-  var map = words.map(function(word){ return self.dictionary[word]; });
-  if (map.every(function(word){ return word === undefined; }))
-    return undefined;
 
-  return map.reduce(function(score, sentiment) {
-    return score + ({positive: 1, negative: -1}[sentiment] || 0);
-  }, 0);
+  var map = words.map(function(word){
+    var sentiment = self.dictionary[word];
+    var score = ({positive: 1, negative: -1}[sentiment] || 0);
+
+    any_defined = any_defined || sentiment;
+
+    if (sentiment != null && !hits[word])
+      hits[word] = score;
+
+    return score;
+  });
+
+  if (!any_defined)
+    return {score: undefined, hits: {}};
+
+  return {
+    score: map.reduce((t, s) => t + s, 0),
+    hits: hits,
+  };
 };
 
 var instance;

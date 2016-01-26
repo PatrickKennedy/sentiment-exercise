@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 var config = require('./config');
-var fs = require('fs');
-var parse = require('csv-parse');
 var argv = require('yargs')
     .usage('Usage: node main.js [options]')
     .option('k', {

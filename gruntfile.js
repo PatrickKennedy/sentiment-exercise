@@ -82,12 +82,13 @@ module.exports = function(grunt) {
         options : {
           "expr": true, // disable warnings about chai-expect in tests
         },
-        files: '<%= app_files.jsunit %>'
+        src: ['<%= app_files.jsunit %>'],
       },
       gruntfile: [
         'Gruntfile.js'
       ],
       options: {
+        esversion: 6,
         curly: true,
         immed: true,
         newcap: true,

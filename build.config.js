@@ -4,8 +4,8 @@ module.exports = {
   compile_dir: 'release',
 
   app_files: {
-    js: [ 'src/**/*.js', '!src/**/*.spec.js' ],
-    jsunit: [ 'src/**/*.spec.js' ],
+    js: ['app.js', 'src/**/*.js', '!src/**/*.spec.js'],
+    jsunit: ['src/**/*.spec.js'],
   },
 
   test_files: {

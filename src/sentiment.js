@@ -20,6 +20,6 @@ Analyzer.prototype.process = function(words) {
 var instance;
 
 module.exports = function(dictionary) {
-  instance = instance || new Analyzer(dictionary)
+  instance = instance || new Analyzer(dictionary);
   return instance;
 };

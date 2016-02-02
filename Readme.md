@@ -1,3 +1,29 @@
+# Intro
+
+This is an exercise in developing an app to spec with an emphasis on structure and extensibility.
+
+I didn't want to ruin the beauty that is the original README below so here's some instructions:
+### Installing
+Standard `npm install` works here, but to run tests you'll likely need to install the grunt-cli and/or mocha globally `npm install -g grunt-cli`
+
+### Configuration
+You can add a local.js and copy the structure from config.js or it will check the environment for the variables. Each key is in the `TWITTER_CONSUMER_KEY` style.
+
+### Running Tests
+the package.json includes a test command `npm test`, otherwise `grunt watch` works to run the tests
+
+### Running app.js
+You can either use `npm start` or `node app.js`
+
+To pass arguments through npm you need to add a --
+ex. `npm start -- -k "#haiku" -s 5 -v`
+
+### Chrome Extension
+
+With the chrome extension you just need to enable developer mode on the extensions screen and drag it into the page.
+Chrome will add an icon on Twitter.com to update the analytics (i.e. for when new tweets load).
+
+
 # Socialytics: The Next Big Thing
 
 I'm excited to annouce the launch of Socialytics, a cutting-edge social media analytics firm. Our primary mission is to analyze Twitter data to assess consumer sentiment.
